@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // <-- Replace this with your Gemini API key
+const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // Replace this
 
 const chatbox = document.getElementById("chatbox");
 const input = document.getElementById("user-input");
@@ -14,7 +14,7 @@ themeToggle.onclick = () => {
   themeToggle.textContent = dark ? "🌞" : "🌙";
 };
 
-// Message sending
+// Sending messages
 sendButton.onclick = sendMessage;
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") sendMessage();
@@ -23,7 +23,7 @@ input.addEventListener("keydown", (e) => {
 function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
-  const msgText = addMessage("You", text, "user");
+  addMessage("You", text, "user");
   input.value = "";
   getAstrologyResponse(text);
 }
@@ -38,26 +38,26 @@ function addMessage(sender, text, role = "user") {
 }
 
 async function getAstrologyResponse(userInput) {
-  const responseEl = addMessage("Sage Mira", "✨ Consulting the stars...", "bot");
+  const responseEl = addMessage("Sage Mira", "🔮 Asking the stars...", "bot");
 
-  const isIndian = userInput.toLowerCase().includes("india") || userInput.toLowerCase().includes("vedic");
+  if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY") {
+    responseEl.innerHTML = "❌ API key missing! Please replace it in script.js.";
+    return;
+  }
+
+  const isIndian = /india|vedic/i.test(userInput);
   const systemPrompt = isIndian
-    ? "Use Indian Vedic astrology. Use Nakshatras, Rashis, and a poetic tone."
-    : "Use Western astrology style with houses, signs, and planets.";
+    ? "Use Indian Vedic astrology with Rashis, Nakshatras and spiritual tone."
+    : "Use Western astrology with planetary alignments and houses.";
 
   const prompt = `
-You are Sage Mira, a wise mystical AI astrologer.
-Give poetic, deep insights based on the user's birth data or question.
+You are Sage Mira, an AI astrologer.
 
-Style: Use ${isIndian ? "Indian Vedic" : "Western"} astrology.
-Format output with:
-- **bold titles**
-- 🔹 bullet points
-- ✨ spiritual tone
-- <br> for line breaks
----
+Style: ${isIndian ? "Vedic" : "Western"} astrology.
+Add mystical depth, poetic tone.
+Use emojis, <br>, **bold**, and 🔹 bullets.
 
-User's message: "${userInput}"
+User asked: "${userInput}"
 `;
 
   try {
@@ -73,16 +73,22 @@ User's message: "${userInput}"
     );
 
     const data = await res.json();
-    const output = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    const output =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data?.candidates?.[0]?.content?.parts?.[0]?.text?.toString() ||
+      data?.candidates?.[0]?.content?.text;
+
     if (!output) {
-      responseEl.innerHTML = "⚠️ Gemini returned no prediction.";
+      console.warn("Raw Gemini response:", data);
+      responseEl.innerHTML = "⚠️ Gemini responded, but no prediction text was found.";
       return;
     }
 
     showTypingEffect(formatResponse(output), responseEl);
   } catch (err) {
     console.error("Gemini error:", err);
-    responseEl.innerHTML = "⚠️ The stars failed to respond.";
+    responseEl.innerHTML = "⚠️ Failed to reach Gemini. Check your API key and connection.";
   }
 }
 
