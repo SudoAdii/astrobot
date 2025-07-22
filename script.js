@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // Replace this with your Gemini API key
+const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE";  // Replace this with your Gemini API key
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
 const chatbox = document.getElementById("chatbox");
