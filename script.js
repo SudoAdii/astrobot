@@ -1,44 +1,86 @@
-const apiKey = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; 
+const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // Replace this with your Gemini API key
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
-async function getAstroReading() {
-  const inputEl = document.getElementById("userInput");
-  const chatbox = document.getElementById("chatbox");
-  const input = inputEl.value.trim();
+const chatbox = document.getElementById("chatbox");
+const inputForm = document.getElementById("inputForm");
+const userInput = document.getElementById("userInput");
+const toggleTheme = document.getElementById("toggleTheme");
 
-  if (!input) return;
+let currentUserMessage = "";
 
-  chatbox.innerHTML += `<p><strong>You:</strong> ${input}</p>`;
+// Theme toggling
+toggleTheme.onclick = () => {
+  document.body.classList.toggle("light");
+};
 
-  // Detect region for astrology system
-  const isIndian = /india|delhi|mumbai|kolkata|chennai|bangalore|hyderabad|jaipur|surat|pune|indore/i.test(input);
+// Handle form submit
+inputForm.onsubmit = async (e) => {
+  e.preventDefault();
+  currentUserMessage = userInput.value.trim();
+  if (!currentUserMessage) return;
+
+  addMessage("you", `<strong>You:</strong> ${currentUserMessage}`);
+  userInput.value = "";
+
+  const botMsgEl = addMessage("bot", "<em class='typing'>Sage Mira is aligning the stars...</em>");
+  await requestAstrologyResponse(botMsgEl);
+};
+
+// Add message to chat
+function addMessage(role, html) {
+  const div = document.createElement("div");
+  div.className = `message ${role}`;
+  div.innerHTML = html;
+  chatbox.appendChild(div);
+  chatbox.scrollTop = chatbox.scrollHeight;
+  return div;
+}
+
+// Generate prompt and send to Gemini
+async function requestAstrologyResponse(botMessageElement) {
+  const textElement = botMessageElement.querySelector(".typing") || botMessageElement;
+
+  const isIndian = /india|mumbai|delhi|kolkata|chennai|hyderabad|lucknow|kanpur/i.test(currentUserMessage);
   const system = isIndian ? "Vedic (Indian)" : "Western";
 
   const prompt = `
-You are Sage Mira, a wise and poetic astrologer with deep mastery in ${system} astrology.
+You are Sage Mira, an expert in ${system} astrology.
+Given the user input:
+"${currentUserMessage}"
 
-Analyze the following birth details and provide a detailed, emotional, and spiritually insightful reading:
-"${input}"
+Provide a spiritual, poetic astrological reading.
+If using Vedic, reflect on karma or past lives.
+Avoid robotic tone and questions.
+  `;
 
-Speak like a real astrologer. Never ask questions. Your tone should be mystical, warm, and poetic. Reflect past-life themes if using Vedic astrology.
-`;
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
-    {
+  try {
+    const res = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [
+          {
+            parts: [{ text: prompt }]
+          }
+        ]
       }),
-    }
-  );
+    });
 
-  const data = await response.json();
-  const output = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from the stars.";
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "✨ The stars are silent.";
 
-  chatbox.innerHTML += `<p><strong>Sage Mira:</strong> ${output}</p>`;
-  chatbox.scrollTop = chatbox.scrollHeight;
-  inputEl.value = "";
+    typeResponse(text, botMessageElement);
+  } catch (err) {
+    textElement.innerText = "⚠️ An error occurred.";
+  }
+}
+
+// Typing effect
+function typeResponse(text, element, i = 0) {
+  element.innerHTML = "";
+  const interval = setInterval(() => {
+    element.innerHTML += text[i];
+    i++;
+    if (i >= text.length) clearInterval(interval);
+  }, 15);
 }
