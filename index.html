@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AstroGPT - Gemini Chatbot</title>
+  <title>AstroAI • Sage Mira</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="chat-wrapper">
-    <div id="chat-container" class="chat-container"></div>
-    <div class="input-container">
-      <input type="text" id="user-input" placeholder="Ask your question about birth chart, zodiac, or future..."/>
-      <button id="send-button">🔮</button>
-    </div>
+  <div class="header">
+    🔮 AstroAI — Sage Mira <button id="theme-toggle">🌙</button>
   </div>
-
+  <div id="chatbox" class="chatbox"></div>
+  <div class="input-area">
+    <input id="user-input" type="text" placeholder="Ask about your birth chart..." autocomplete="off" />
+    <button id="send-button">➤</button>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
