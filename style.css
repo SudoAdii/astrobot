@@ -1,68 +1,89 @@
+:root {
+  --bg: #0e0e0e;
+  --fg: #f1f1f1;
+  --accent: #bb86fc;
+  --input-bg: #1f1f1f;
+}
+
+body.light {
+  --bg: #ffffff;
+  --fg: #000000;
+  --accent: #6200ee;
+  --input-bg: #eeeeee;
+}
+
 body {
-  background: #0f0f0f;
-  font-family: 'Segoe UI', sans-serif;
-  color: #f4f4f4;
   margin: 0;
-  padding: 0;
-}
-
-.container {
-  max-width: 600px;
-  margin: 50px auto;
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #ffdd57;
-}
-
-#chatbox {
-  height: 320px;
-  overflow-y: auto;
-  background: #121212;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.input-area {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  height: 100vh;
 }
 
-input[type="text"] {
+.app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+main {
   flex: 1;
-  padding: 10px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+form {
+  display: flex;
+  padding: 1rem;
+  gap: 10px;
+  background: var(--input-bg);
+}
+
+input {
+  flex: 1;
+  padding: 0.8rem;
   border: none;
-  border-radius: 5px;
-  background: #2b2b2b;
-  color: #fff;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 button {
-  padding: 10px 15px;
-  background: #ffdd57;
+  padding: 0.8rem 1.2rem;
+  background: var(--accent);
   border: none;
-  border-radius: 5px;
-  color: #000;
-  font-weight: bold;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
   cursor: pointer;
 }
 
-button:hover {
-  background: #ffd633;
+.message {
+  margin-bottom: 1rem;
+  line-height: 1.6;
 }
 
-.footer {
-  font-size: 13px;
-  color: #aaa;
-  text-align: center;
-  margin-top: 20px;
+.message.you strong {
+  color: var(--accent);
+}
+
+.message.bot strong {
+  color: #4caf50;
+}
+
+.typing {
+  opacity: 0.6;
+  font-style: italic;
 }
