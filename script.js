@@ -1,102 +1,73 @@
-const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // 🔑 Replace with your actual Gemini API Key
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // 🔑 Replace with your actual key
 
 const chatContainer = document.getElementById("chat-container");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-button");
 
-let isGeneratingResponse = false;
-
-// Utility: create chat bubble
-function createMessageElement(message, sender) {
-    const messageElement = document.createElement("div");
-    messageElement.classList.add("message", `message--${sender}`);
-    messageElement.innerHTML = `<div class="message__text">${message}</div>`;
-    return messageElement;
-}
-
-// Utility: typing effect
-function showTypingEffect(fullText, element, delay = 20) {
-    let index = 0;
-    element.innerText = "";
-    const interval = setInterval(() => {
-        if (index < fullText.length) {
-            element.innerText += fullText[index++];
-        } else {
-            clearInterval(interval);
-        }
-    }, delay);
-}
-
-// Send message
 async function sendMessage() {
-    const input = userInput.value.trim();
-    if (!input || isGeneratingResponse) return;
+  const input = userInput.value.trim();
+  if (!input) return;
 
-    // Display user message
-    const userMessage = createMessageElement(input, "user");
-    chatContainer.appendChild(userMessage);
-    userInput.value = "";
+  appendMessage(input, "user");
+  userInput.value = "";
 
-    // Bot placeholder
-    const botMessage = createMessageElement("✨ Reading your stars...", "bot");
-    chatContainer.appendChild(botMessage);
+  const loadingMsg = appendMessage("✨ Reading your stars...", "bot");
 
-    // Scroll
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  try {
+    const system = /india|delhi|mumbai|kolkata|chennai|hyderabad|vedic/i.test(input)
+      ? "Vedic (Indian)"
+      : "Western";
 
-    isGeneratingResponse = true;
+    const prompt = `
+You are Sage Mira, a wise, poetic AI astrologer. Respond using deep and region-specific astrology (use ${system} system) with elegant, mystical tone.
+User asked: "${input}"
+    `.trim();
 
-    try {
-        const isIndian = /india|delhi|mumbai|kolkata|chennai|bangalore|hyderabad|jaipur|surat|pune|indore/i.test(input);
-        const system = isIndian ? "Vedic (Indian)" : "Western";
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          role: "user",
+          parts: [{ text: prompt }]
+        }]
+      })
+    });
 
-        const prompt = `
-You are Sage Mira, an astrologer of great renown, who gives spiritually profound, poetic, and region-accurate astrological readings. 
-Use the ${system} astrology system based on the user's input.
+    const data = await res.json();
+    console.log("Gemini Response:", data);
 
-User query: "${input}"
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-Craft a mystical birth chart interpretation or astrological insight based on the system. Keep your tone elegant, magical, yet warm.
-        `.trim();
+    if (!text) throw new Error("Gemini returned no readable response.");
 
-        const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        role: "user",
-                        parts: [{ text: prompt }]
-                    }
-                ]
-            })
-        });
+    showTypingEffect(text, loadingMsg.querySelector(".message__text"));
 
-        const data = await res.json();
-        console.log("Gemini API response:", data);
-
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!text) {
-            throw new Error("Gemini returned no astrological response.");
-        }
-
-        const botTextElement = botMessage.querySelector(".message__text");
-        showTypingEffect(text, botTextElement, 25);
-
-    } catch (err) {
-        console.error("Error:", err.message);
-        const botTextElement = botMessage.querySelector(".message__text");
-        botTextElement.innerText = `⚠️ ${err.message || "Something went wrong with the stars."}`;
-    }
-
-    isGeneratingResponse = false;
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  } catch (err) {
+    loadingMsg.querySelector(".message__text").innerText = "⚠️ " + err.message;
+    console.error("Error:", err);
+  }
 }
 
-// Events
+function appendMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.className = `message message--${sender}`;
+  msg.innerHTML = `<div class="message__text">${text}</div>`;
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+  return msg;
+}
+
+function showTypingEffect(text, el, delay = 25) {
+  let i = 0;
+  el.innerText = "";
+  const interval = setInterval(() => {
+    el.innerText += text[i++];
+    if (i >= text.length) clearInterval(interval);
+  }, delay);
+}
+
 sendBtn.addEventListener("click", sendMessage);
 userInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
+  if (e.key === "Enter") sendMessage();
 });
