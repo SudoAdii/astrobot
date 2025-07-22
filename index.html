@@ -3,99 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AstroChat – AI Astrology Bot</title>
+  <title>Mira Astrology Chat</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #0e0e0e;
+      background: linear-gradient(to right, #090a0f, #1b1c29);
       color: #fff;
       display: flex;
       flex-direction: column;
-      align-items: center;
       height: 100vh;
     }
-    #chat-container {
-      width: 100%;
-      max-width: 600px;
-      height: 80vh;
-      overflow-y: auto;
-      padding: 20px;
-      box-sizing: border-box;
+    header {
+      padding: 1rem;
+      text-align: center;
+      background: #15151e;
+      font-size: 1.4rem;
+      font-weight: bold;
       border-bottom: 1px solid #333;
     }
+    #chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
     .message {
-      margin: 10px 0;
-      padding: 10px 15px;
-      border-radius: 12px;
-      max-width: 85%;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      max-width: 80%;
+      line-height: 1.5;
       white-space: pre-wrap;
     }
     .user {
-      background: #1e1e1e;
+      background: #2a2c3a;
       align-self: flex-end;
-      text-align: right;
     }
     .bot {
-      background: #2c2c2c;
+      background: #1e202e;
       align-self: flex-start;
-      text-align: left;
     }
-    .input-area {
+    #input-area {
       display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 600px;
-      padding: 10px;
-      box-sizing: border-box;
+      padding: 1rem;
+      background: #15151e;
+      border-top: 1px solid #333;
     }
     #user-input {
       flex: 1;
-      padding: 10px;
+      padding: 0.8rem;
+      font-size: 1rem;
       border: none;
       border-radius: 8px;
-      font-size: 1rem;
+      margin-right: 0.5rem;
     }
     #send-btn {
-      padding: 10px 20px;
-      font-size: 1rem;
-      background: #6e4bc5;
-      color: white;
+      background: #6c5ce7;
       border: none;
+      color: white;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
       border-radius: 8px;
       cursor: pointer;
     }
-    #clear-btn {
-      margin-top: 10px;
-      background: #444;
-      color: #ccc;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
+    #send-btn:hover {
+      background: #7d6dfb;
     }
   </style>
 </head>
 <body>
+  <header>Mira — Your Astrologer</header>
   <div id="chat-container"></div>
-
-  <div class="input-area">
-    <input id="user-input" type="text" placeholder="Ask Mira your stars..." />
+  <div id="input-area">
+    <input id="user-input" type="text" placeholder="Ask about your future..." />
     <button id="send-btn">🔮 Ask</button>
   </div>
 
-  <button id="clear-btn">🧹 Clear Chat</button>
-
   <script>
-    const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // Replace with your Gemini API Key
+    const API_KEY = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; // replace this with your real API key
     const chatContainer = document.getElementById("chat-container");
     const userInput = document.getElementById("user-input");
     const sendBtn = document.getElementById("send-btn");
-    const clearBtn = document.getElementById("clear-btn");
-
     let convoHistory = JSON.parse(localStorage.getItem("astroChatHistory")) || [];
 
-    // Load previous messages
     window.onload = () => {
       convoHistory.forEach(({ role, text }) => addMessage(role, text));
     };
@@ -115,14 +107,8 @@
         convoHistory.push({ role: "bot", text: reply });
         localStorage.setItem("astroChatHistory", JSON.stringify(convoHistory));
       } else {
-        addMessage("bot", "⚠️ Sorry, the stars aren't responding right now.");
+        addMessage("bot", "⚠️ I couldn't read the stars at the moment.");
       }
-    };
-
-    clearBtn.onclick = () => {
-      convoHistory = [];
-      localStorage.removeItem("astroChatHistory");
-      chatContainer.innerHTML = "";
     };
 
     function addMessage(role, text) {
@@ -143,11 +129,11 @@
 
       const intro = {
         role: "user",
-        parts: [{
-          text: `You are Mira, a friendly modern astrologer. Speak simply and warmly like you're talking to a friend. 
-If user mentions India or Indian cities, use Vedic astrology. 
-Keep it short: 1 line on love, 1 on career or luck, 1 lucky tip or warning. Use emojis.`
-        }]
+        parts: [
+          {
+            text: `You are Mira, a highly respected and professional astrologer with deep knowledge of both Indian (Vedic) and Western astrology. Always give short but deeply insightful predictions in a respectful tone. When asked something astrological, give predictions for love ❤️, career 💼, and overall energy 🌌. Always write in elegant yet simple English, no slang, and make sure it feels like a spiritual guide is speaking. Address the user with dignity and a tone of respect.`,
+          },
+        ],
       };
 
       try {
@@ -160,10 +146,10 @@ Keep it short: 1 line on love, 1 on career or luck, 1 lucky tip or warning. Use 
               contents: [intro, ...promptMessages],
               generationConfig: {
                 temperature: 0.7,
-                maxOutputTokens: 300,
+                maxOutputTokens: 400,
                 topK: 40,
-                topP: 0.95
-              }
+                topP: 0.95,
+              },
             }),
           }
         );
