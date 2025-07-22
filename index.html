@@ -3,32 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AstroSage Mira</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>AstroGPT - Gemini Chatbot</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>🔮 AstroSage Mira</h1>
-      <button id="toggleTheme">🌓</button>
-    </header>
-
-    <main id="chatbox">
-      <!-- Chat messages will appear here -->
-    </main>
-
-    <form id="inputForm">
-      <input
-        type="text"
-        id="userInput"
-        placeholder="e.g. 1995-07-22 03:00 AM, Mumbai, India"
-        required
-      />
-      <button type="submit">Send</button>
-    </form>
+  <div class="chat-wrapper">
+    <div id="chat-container" class="chat-container"></div>
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Ask your question about birth chart, zodiac, or future..."/>
+      <button id="send-button">🔮</button>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
