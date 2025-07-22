@@ -1,4 +1,4 @@
-const apiKey = "YOUR_GEMINI_API_KEY"; // 🔒 Replace this with your real API key
+const apiKey = "AIzaSyCPtwqRY23TExC6s_v7i04cE0x7TBouUaE"; 
 
 async function getAstroReading() {
   const inputEl = document.getElementById("userInput");
